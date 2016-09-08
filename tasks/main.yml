@@ -1,1 +1,105 @@
 ---
+# install
+- name: Add repository file
+  template:
+    src: MariaDB.repo.j2
+    dest: /etc/yum.repos.d/mariadb.repo
+    owner: root
+    group: root
+    mode: 00644
+
+- name: Ensure mysql packages are installed.
+  yum:
+    name: "{{ item }}"
+    state: latest
+    enablerepo: "{{ mysql_enablerepo }}"
+  with_items: "{{ mysql_packages }}"
+  notify: restart mysql
+
+# configure
+- name: Place mysql configuration file in place.
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 00644
+  notify: restart mysql
+
+- name: Create log dir if it does not exist
+  file:
+    path: "{{ mysql_log_dir }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode:  00755
+
+- name: Create slow query log file.
+  shell: "touch {{ mysql_slow_query_log_file }} creates={{ mysql_slow_query_log_file }}"
+
+- name: Set ownership on slow query log file.
+  file:
+    path: "{{ mysql_slow_query_log_file }}"
+    state: file
+    owner: mysql
+    group: mysql
+    mode: 00640
+
+- name: Create error log file.
+  shell: "touch {{ mysql_log_error }} creates={{ mysql_log_error }}"
+
+- name: Set ownership on error log file.
+  file:
+    path: "{{ mysql_log_error }}"
+    state: file
+    owner: mysql
+    group: mysql
+    mode: 00640
+
+# service
+- name: Ensure mysql is started and enabled to start at boot.
+  service: name=mysql state=started enabled=yes
+
+# # mysql secure installation
+# - name: Set root Password
+#   mysql_user:
+#     name: root
+#     host: {{ item }}
+#     password: {{ mysql_root_password }}
+#     state: present
+#   with_items:
+#     - localhost
+#     - 127.0.0.1
+#     - ::1
+#
+# - name: Reload privilege tables
+#   command: 'mysql -ne "{{ item }}"'
+#   with_items:
+#     - FLUSH PRIVILEGES
+#   changed_when: False
+#
+# - name: Remove anonymous users
+#   command: 'mysql -ne "{{ item }}"'
+#   with_items:
+#     - DELETE FROM mysql.user WHERE User=''
+#   changed_when: False
+#
+# - name: Disallow root login remotely
+#   command: 'mysql -ne "{{ item }}"'
+#   with_items:
+#     - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+#   changed_when: False
+#
+# - name: Remove test database and access to it
+#   command: 'mysql -ne "{{ item }}"'
+#   with_items:
+#     - DROP DATABASE test
+#     - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
+#   changed_when: False
+#   ignore_errors: True
+#
+# - name: Reload privilege tables
+#   command: 'mysql -ne "{{ item }}"'
+#   with_items:
+#     - FLUSH PRIVILEGES
+#   changed_when: False
