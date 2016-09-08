@@ -61,7 +61,6 @@
   service: name=mysql state=started enabled=yes
 
 # secure installation
-# Has to be after the root password assignment, for idempotency.
 - name: Copy .my.cnf file with root password credentials.
   template:
     src: "user-my.cnf.j2"
@@ -92,3 +91,27 @@
 
 - name: Remove MySQL test database.
   mysql_db: "name='test' state=absent"
+
+# configure backup task.
+- name: Create backup group.
+  group: name=backup
+
+- name: Create backup user.
+  user: name=backup group=backup createhome=yes shell=/sbin/nologin
+
+- name: Place mysql backup script in place.
+  template:
+    src: backup-mysql.sh.j2
+    dest: /usr/local/bin/backup-mysql.sh
+    owner: root
+    group: root
+    mode: 00750
+
+- name: Creates dairy mysql backup cronjob.
+  cron:
+    name: "Backup mysql tables (dairy schedule)"
+    user: root
+    minute: "00"
+    hour: "5"
+    job: "sh /usr/local/bin/backup-mysql.sh"
+    cron_file: mysql-backup
