@@ -5,9 +5,12 @@ mysql_packages:
   - mariadb
   - mariadb-server
   - mariadb-devel
+  - MySQL-python
 mysql_log_dir: /var/log/mysql
 
-mysql_root_password: "password"
+mysql_user_home: /root
+mysql_root_username: root
+mysql_root_password: password
 
 # -----------------------------------------------------------------------------
 # my.cnf
