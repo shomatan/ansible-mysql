@@ -34,27 +34,21 @@
     group: mysql
     mode:  00755
 
-- name: Create slow query log file.
-  shell: "touch {{ mysql_slow_query_log_file }} creates={{ mysql_slow_query_log_file }}"
-
-- name: Set ownership on slow query log file.
+- name: Touch slow query log file.
   file:
-    path: "{{ mysql_slow_query_log_file }}"
-    state: file
+    path: {{ mysql_slow_query_log_file }}
     owner: mysql
     group: mysql
-    mode: 00640
+    mode:  00640
+    state: touch
 
-- name: Create error log file.
-  shell: "touch {{ mysql_log_error }} creates={{ mysql_log_error }}"
-
-- name: Set ownership on error log file.
+- name: Touch error log file.
   file:
-    path: "{{ mysql_log_error }}"
-    state: file
+    path: {{ mysql_log_error }}
     owner: mysql
     group: mysql
-    mode: 00640
+    mode:  00640
+    state: touch
 
 # service
 - name: Ensure mysql is started and enabled to start at boot.
