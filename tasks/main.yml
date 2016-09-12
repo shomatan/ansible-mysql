@@ -36,7 +36,7 @@
 
 - name: Touch slow query log file.
   file:
-    path: {{ mysql_slow_query_log_file }}
+    path: "{{ mysql_slow_query_log_file }}"
     owner: mysql
     group: mysql
     mode:  00640
@@ -44,7 +44,7 @@
 
 - name: Touch error log file.
   file:
-    path: {{ mysql_log_error }}
+    path: "{{ mysql_log_error }}"
     owner: mysql
     group: mysql
     mode:  00640
