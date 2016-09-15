@@ -35,20 +35,24 @@
     mode:  00755
 
 - name: Touch slow query log file.
-  file:
-    path: "{{ mysql_slow_query_log_file }}"
+  copy:
+    dest: "{{ mysql_slow_query_log_file }}"
+    content: ""
     owner: mysql
     group: mysql
     mode:  00640
     state: touch
+    force: no
 
 - name: Touch error log file.
-  file:
-    path: "{{ mysql_log_error }}"
+  copy:
+    dest: "{{ mysql_log_error }}"
+    content: ""
     owner: mysql
     group: mysql
     mode:  00640
     state: touch
+    force: no
 
 # service
 - name: Ensure mysql is started and enabled to start at boot.
