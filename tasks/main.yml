@@ -41,7 +41,6 @@
     owner: mysql
     group: mysql
     mode:  00640
-    state: touch
     force: no
 
 - name: Touch error log file.
@@ -51,7 +50,6 @@
     owner: mysql
     group: mysql
     mode:  00640
-    state: touch
     force: no
 
 # service
