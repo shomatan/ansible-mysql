@@ -113,7 +113,7 @@
 - name: Place mysql backup script in place.
   template:
     src: backup-mysql.sh.j2
-    dest: /usr/local/bin/backup-mysql.sh
+    dest: /usr/local/bin/backup-mysql
     owner: root
     group: root
     mode: 00750
@@ -124,7 +124,7 @@
     user: root
     minute: "00"
     hour: "5"
-    job: "sh /usr/local/bin/backup-mysql.sh"
+    job: "sh /usr/local/bin/backup-mysql"
     cron_file: mysql-backup
 
 - name: Create backup directory. If it does not exist
