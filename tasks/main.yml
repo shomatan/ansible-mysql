@@ -9,48 +9,23 @@
     enabled: no
 
 - name: Ensure mysql packages are installed.
-  yum:
-    name: "{{ item }}"
-    state: latest
-    enablerepo: "{{ mysql_enablerepo }}"
+  yum: name={{ item }} state=latest enablerepo={{ mysql_enablerepo }}
   with_items: "{{ mysql_packages }}"
   notify: restart mysql
 
 # configure
-- name: Place mysql configuration file in place.
-  template:
-    src: my.cnf.j2
-    dest: /etc/my.cnf
-    owner: root
-    group: root
-    mode: 00644
+- name: Copy mysql configuration file in place.
+  template: src=my.cnf.j2 dest=/etc/my.cnf
   notify: restart mysql
 
 - name: Create log dir if it does not exist
-  file:
-    path: "{{ mysql_log_dir }}"
-    state: directory
-    owner: mysql
-    group: mysql
-    mode:  00755
+  file: path={{ mysql_log_dir }} state=directory owner=mysql group=mysql
 
 - name: Touch slow query log file.
-  copy:
-    dest: "{{ mysql_slow_query_log_file }}"
-    content: ""
-    owner: mysql
-    group: mysql
-    mode:  00640
-    force: no
+  copy: dest={{ mysql_slow_query_log_file }} content="" owner=mysql group=mysql mode=00640 force=no
 
 - name: Touch error log file.
-  copy:
-    dest: "{{ mysql_log_error }}"
-    content: ""
-    owner: mysql
-    group: mysql
-    mode:  00640
-    force: no
+  copy: dest={{ mysql_log_error }} content="" owner=mysql group=mysql mode=00640 force=no
 
 # service
 - name: Ensure mysql is started and enabled to start at boot.
@@ -80,12 +55,7 @@
 
 # Has to be after the root password assignment, for idempotency.
 - name: Copy .my.cnf file with root password credentials.
-  template:
-    src: "user-my.cnf.j2"
-    dest: "{{ mysql_user_home }}/.my.cnf"
-    owner: root
-    group: root
-    mode: 0600
+  template: src=user-my.cnf.j2 dest={{ mysql_user_home }}/.my.cnf mode=0600
 
 - name: Get list of hosts for the anonymous user.
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
@@ -111,12 +81,7 @@
   user: name=backup group=backup createhome=yes shell=/sbin/nologin
 
 - name: Place mysql backup script in place.
-  template:
-    src: backup-mysql.sh.j2
-    dest: /usr/local/bin/backup-mysql
-    owner: root
-    group: root
-    mode: 00750
+  template: src=backup-mysql.sh.j2 dest=/usr/local/bin/backup-mysql mode=00750
 
 - name: Creates dairy mysql backup cronjob.
   cron:
@@ -127,10 +92,5 @@
     job: "sh /usr/local/bin/backup-mysql"
     cron_file: mysql-backup
 
-- name: Create backup directory. If it does not exist
-  file:
-    path: /home/backup/mysql
-    state: directory
-    owner: backup
-    group: backup
-    mode:  00755
+- name: Create backup directory.
+  file: path=/home/backup/mysql state=directory owner=backup group=backup mode=00755
