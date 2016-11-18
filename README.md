@@ -2,7 +2,7 @@
 Installs and configures MariaDB.
 
 ## Requirements
-None.
++ ansible > 2.2.0
 
 ## Role Variables
 |Key|Type|Description|Default|
