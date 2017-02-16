@@ -1,4 +1,8 @@
 ---
+# variable setup.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+    
 # install
 - name: Add mariadb repository.
   yum_repository:
@@ -64,14 +68,11 @@
   check_mode: no
 
 - name: Remove anonymous MySQL users.
-  mysql_user:
-     name: ""
-     host: "{{ item }}"
-     state: absent
+  mysql_user: name="" host={{ item }} state=absent
   with_items: "{{ mysql_anonymous_hosts.stdout_lines }}"
 
 - name: Remove MySQL test database.
-  mysql_db: "name='test' state=absent"
+  mysql_db: name=test state=absent
 
 # configure backup task.
 - name: Create backup group.
